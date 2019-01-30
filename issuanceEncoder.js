@@ -10,7 +10,7 @@ var OP_CODES = [
 
 var sffc = require('sffc-encoder')
 var issueFlagsCodex = require('./issueFlagsEncoder.js')
-var paymentCodex = require('cc-payment-encoder')
+var paymentCodex = require('digiasset-payment-encoder')
 
 var consumer = function (buff) {
   var curr = 0

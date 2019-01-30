@@ -1,11 +1,11 @@
 {
-  "name": "cc-issuance-encoder",
+  "name": "digiasset-issuance-encoder",
   "version": "1.1.1",
-  "description": "The encoding/decoding functions for the colored-coins scheme issuance set of OP_CODES",
+  "description": "The encoding/decoding functions for the digiasset scheme issuance set of OP_CODES",
   "main": "issuanceEncoder.js",
   "dependencies": {
     "sffc-encoder": "^0.1.9",
-    "cc-payment-encoder": "^1.0.0"
+    "digiasset-payment-encoder": "^1.0.0"
   },
   "directories": {
     "test": "test"
@@ -24,6 +24,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Colored-Coins/Issuance-Encoder.git"
+    "url": "https://github.com/DigiByte-Core/Issuance-Encoder.git"
   }
 }

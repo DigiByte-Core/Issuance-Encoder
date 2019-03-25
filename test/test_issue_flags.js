@@ -1,4 +1,4 @@
-var ccEncoding = require(__dirname + '/../issueFlagsEncoder')
+var daEncoding = require(__dirname + '/../issueFlagsEncoder')
 var assert = require('assert')
 
 var consumer = function (buff) {
@@ -65,8 +65,8 @@ describe('Test issue flags encoder', function () {
     ]
 
     for (var i = 0; i < testCase.length; i++) {
-      var code = ccEncoding.encode(testCase[i])
-      var decode = ccEncoding.decode(consumer(code))
+      var code = daEncoding.encode(testCase[i])
+      var decode = daEncoding.decode(consumer(code))
       assert.equal(decode.divisibility, testCase[i].divisibility, 'Divisibility encode has problems')
       assert.equal(decode.lockStatus, testCase[i].lockStatus, 'LockStatus encode has problems')
       assert.equal(decode.aggregationPolicy, testCase[i].aggregationPolicy, 'Aggregate policy has problems')
@@ -90,7 +90,7 @@ describe('Test issue flags encoder', function () {
 
     for (var i = 0; i < testCase.length; i++) {
       assert.throws(function () {
-        ccEncoding.encode(testCase[i])
+        daEncoding.encode(testCase[i])
       }, 'Divisibility not in range'
       , 'Wrong fail')
     }
@@ -110,7 +110,7 @@ describe('Test issue flags encoder', function () {
 
     for (var i = 0; i < testCase.length; i++) {
       assert.throws(function () {
-        ccEncoding.encode(testCase[i])
+        daEncoding.encode(testCase[i])
       }, 
       /Invalid aggregation policy/,
       'Wrong fail')

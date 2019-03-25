@@ -3,12 +3,12 @@
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-Issuance-Encoder provides the encode/decode functions between a Colored Coins issuance Object to buffer
+Issuance-Encoder provides the encode/decode functions between a DigiAsset issuance Object to buffer
 
 ### Installation
 
 ```sh
-$ npm install cc-issuance-encoder
+$ npm install digiasset-issuance-encoder
 ```
 
 
@@ -28,7 +28,7 @@ Returns a new Buffer holding the encoded issuance.
 ##### Example:
 
 ```js
-var issuanceEncoder = require('cc-issuance-encoder')
+var issuanceEncoder = require('digiasset-issuance-encoder')
 
 
 ```
@@ -39,12 +39,12 @@ Params:
 
 - consume - takes a consumable buffer (You can use [buffer-consumer] like in the example to create one)
 
-Returns a Colored Coins payment Object
+Returns a DigiAsset payment Object
 
 ##### Example:
 
 ```js
-var issuanceEncoder = require('cc-issuance-encoder')
+var issuanceEncoder = require('digiasset-issuance-encoder')
 
 ```
 
@@ -53,7 +53,7 @@ var issuanceEncoder = require('cc-issuance-encoder')
 In order to test you need to install [mocha] globaly on your machine
 
 ```sh
-$ cd /"module-path"/cc-issuance-Encoder
+$ cd /"module-path"/digiasset-issuance-Encoder
 $ mocha
 ```
 

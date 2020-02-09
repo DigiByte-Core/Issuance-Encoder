@@ -1,30 +1,30 @@
-var OP_CODES = [
-  new Buffer([0x00]), // wild-card to be defined
-  new Buffer([0x01]), // All Hashes in OP_RETURN - Pay-to-PubkeyHash
-  new Buffer([0x02]), // SHA2 in Pay-to-Script-Hash multi-sig output (1 out of 2)
-  new Buffer([0x03]), // All Hashes in Pay-to-Script-Hash multi-sig outputs (1 out of 3)
-  new Buffer([0x04]), // Low security issue no SHA2 for torrent data. SHA1 is always inside OP_RETURN in this case.
-  new Buffer([0x05]), // No rules, no torrent, no meta data ( no one may add rules in the future, anyone can add metadata )
-  new Buffer([0x06])  // No meta data (anyone can add rules and/or metadata  in the future)
+const sffc = require('sffc-encoder')
+const issueFlagsCodex = require('./issueFlagsEncoder.js')
+const paymentCodex = require('digiasset-payment-encoder')
+
+const OP_CODES = [
+  Buffer.from([0x00]), // wild-card to be defined
+  Buffer.from([0x01]), // All Hashes in OP_RETURN - Pay-to-PubkeyHash
+  Buffer.from([0x02]), // SHA2 in Pay-to-Script-Hash multi-sig output (1 out of 2)
+  Buffer.from([0x03]), // All Hashes in Pay-to-Script-Hash multi-sig outputs (1 out of 3)
+  Buffer.from([0x04]), // Low security issue no SHA2 for torrent data. SHA1 is always inside OP_RETURN in this case.
+  Buffer.from([0x05]), // No rules, no torrent, no meta data ( no one may add rules in the future, anyone can add metadata )
+  Buffer.from([0x06])  // No meta data (anyone can add rules and/or metadata  in the future)
 ]
 
-var sffc = require('sffc-encoder')
-var issueFlagsCodex = require('./issueFlagsEncoder.js')
-var paymentCodex = require('digiasset-payment-encoder')
-
-var consumer = function (buff) {
-  var curr = 0
+const consumer = function (buff) {
+  let curr = 0
   return function consume (len) {
     return buff.slice(curr, curr += len)
   }
 }
 
-var padLeadingZeros = function (hex, byteSize) {
+const padLeadingZeros = function (hex, byteSize) {
   return (hex.length === byteSize * 2) ? hex : padLeadingZeros('0' + hex, byteSize)
 }
 
-var decodeAmountByVersion = function (version, consume, divisibility) {
-  var decodedAmount = sffc.decode(consume)
+const decodeAmountByVersion = function (version, consume, divisibility) {
+  const decodedAmount = sffc.decode(consume)
   return (version == 0x01)? (decodedAmount / Math.pow(10, divisibility)) : decodedAmount
 }
 
@@ -37,17 +37,17 @@ module.exports = {
     if (typeof data.aggregationPolicy === 'undefined') throw new Error('Missing aggregationPolicy')
     if (typeof data.protocol === 'undefined') throw new Error('Missing protocol')
     if (typeof data.version === 'undefined') throw new Error('Missing version')
-    var opcode
-    var hash = new Buffer(0)
-    var protocol = new Buffer(padLeadingZeros(data.protocol.toString(16), 2), 'hex')
-    var version = new Buffer([data.version])
-    var issueHeader = Buffer.concat([protocol, version])
-    var amount = sffc.encode(data.amount)
-    var payments = new Buffer(0)
+    let opcode
+    let hash = Buffer.allocUnsafe(0)
+    const protocol = Buffer.from(padLeadingZeros(data.protocol.toString(16), 2), 'hex')
+    const version = Buffer.from([data.version])
+    const issueHeader = Buffer.concat([protocol, version])
+    const amount = sffc.encode(data.amount)
+    let payments = Buffer.allocUnsafe(0)
     if (data.payments) payments = paymentCodex.encodeBulk(data.payments)
-    var issueFlagsByte = issueFlagsCodex.encode({divisibility: data.divisibility, lockStatus: data.lockStatus, aggregationPolicy: data.aggregationPolicy})
-    var issueTail = Buffer.concat([amount, payments, issueFlagsByte])
-    var issueByteSize = issueHeader.length + issueTail.length + 1
+    const issueFlagsByte = issueFlagsCodex.encode({divisibility: data.divisibility, lockStatus: data.lockStatus, aggregationPolicy: data.aggregationPolicy})
+    const issueTail = Buffer.concat([amount, payments, issueFlagsByte])
+    let issueByteSize = issueHeader.length + issueTail.length + 1
 
     if (issueByteSize > byteSize) throw new Error('Data code is bigger then the allowed byte size')
     if (!data.sha2) {
@@ -59,7 +59,7 @@ module.exports = {
       return {codeBuffer: Buffer.concat([issueHeader, opcode, hash, issueTail]), leftover: []}
     }
     if (!data.torrentHash) throw new Error('Torrent Hash is missing')
-    var leftover = [data.torrentHash, data.sha2]
+    const leftover = [data.torrentHash, data.sha2]
 
     opcode = OP_CODES[3]
     issueByteSize = issueByteSize + data.torrentHash.length
@@ -78,21 +78,21 @@ module.exports = {
   },
 
   decode: function (op_code_buffer) {
-    var data = {}
+    const data = {}
     if (!Buffer.isBuffer(op_code_buffer)) {
-      op_code_buffer = new Buffer(op_code_buffer, 'hex')
+      op_code_buffer = Buffer.from(op_code_buffer, 'hex')
     }
-    var byteSize = op_code_buffer.length
-    var lastByte = op_code_buffer.slice(-1)
-    var issueTail = issueFlagsCodex.decode(consumer(lastByte))
+    const byteSize = op_code_buffer.length
+    const lastByte = op_code_buffer.slice(-1)
+    const issueTail = issueFlagsCodex.decode(consumer(lastByte))
     data.divisibility = issueTail.divisibility
     data.lockStatus = issueTail.lockStatus
     data.aggregationPolicy = issueTail.aggregationPolicy
-    var consume = consumer(op_code_buffer.slice(0, byteSize - 1))
+    const consume = consumer(op_code_buffer.slice(0, byteSize - 1))
     data.protocol = parseInt(consume(2).toString('hex'), 16)
     data.version = parseInt(consume(1).toString('hex'), 16)
     data.multiSig = []
-    var opcode = consume(1)
+    const opcode = consume(1)
     if (opcode[0] === OP_CODES[1][0]) {
       data.torrentHash = consume(20)
       data.sha2 = consume(32)
